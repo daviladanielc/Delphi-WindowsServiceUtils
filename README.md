@@ -2,7 +2,7 @@
 Create, delete, stop, start, and change configurations of Windows services.
 
 # Description
-The ISvcUtils interface provides a comprehensive set of functionalities for managing Windows services. Developed by Daniel Carlos Davila, this component simplifies service-related operations, making it easy to work with service configurations, installations, and more.
+The ISvcUtils interface provides a comprehensive set of functionalities for managing Windows services. This component simplifies service-related operations, making it easy to work with service configurations, installations, and more.
 
 Forget about creating .bat files and invoking everything through ShellExecute; now you can do all of that directly in Delphi.
 
