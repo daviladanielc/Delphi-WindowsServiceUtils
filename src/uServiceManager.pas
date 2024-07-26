@@ -4,6 +4,11 @@
 // http://stackoverflow.com/questions/5913279/detect-windows-service-state
 
 // Improved by Daniel Carlos Davila - 2024
+
+{$IF CompilerVersion >= 33.0}
+  {$DEFINE DELPHIRIOUP}
+{$ENDIF}
+
 unit uServiceManager;
 
 interface
@@ -215,7 +220,7 @@ type
     /// Requeries the states, names etc of all services on the given @link(MachineName).
     /// Works only while active.
     /// </summary>
-    function RebuildServicesList: ISvcUtils;
+    procedure RebuildServicesList;
 
     /// <summary>
     /// Install a service and return the instance to set config, start, stop etc...
@@ -290,9 +295,9 @@ uses
 
 { TServiceManager }
 
-function TServiceManager.RebuildServicesList: ISvcUtils;
+procedure TServiceManager.RebuildServicesList;
 var
-  Services, S: PEnumServiceStatus;
+  Services, S: {$IFDEF DELPHIRIOUP}LPENUM_SERVICE_STATUS{$ELSE}PEnumServiceStatus{$ENDIF};
   BytesNeeded, ServicesReturned, ResumeHandle: DWORD;
   i: Integer;
   LServiceInfo: ISvcInfo;
@@ -305,7 +310,7 @@ begin
   ServicesReturned := 0;
   ResumeHandle := 0;
   Services := nil;
-  if EnumServicesStatus(FManager, SERVICE_WIN32, SERVICE_STATE_ALL, Services^,
+  if EnumServicesStatus(FManager, SERVICE_WIN32, SERVICE_STATE_ALL, {$IFDEF DELPHIRIOUP}Services{$ELSE}Services^{$ENDIF},
     0, BytesNeeded, ServicesReturned, ResumeHandle) then
     Exit;
   if GetLastError <> ERROR_MORE_DATA then
@@ -317,7 +322,7 @@ begin
     ResumeHandle := 0;
     S := Services;
     if not EnumServicesStatus(FManager, SERVICE_WIN32, SERVICE_STATE_ALL,
-      Services^, BytesNeeded, BytesNeeded, ServicesReturned, ResumeHandle) then
+      {$IFDEF DELPHIRIOUP}Services{$ELSE}Services^{$ENDIF}, BytesNeeded, BytesNeeded, ServicesReturned, ResumeHandle) then
       Exit;
     for i := 0 to ServicesReturned - 1 do
     begin
@@ -1018,7 +1023,7 @@ end;
 
 procedure TServiceInfo.SearchDependents;
 var
-  Services, S: PEnumServiceStatus;
+  Services, S: {$IFDEF DELPHIRIOUP}LPENUM_SERVICE_STATUS{$ELSE}PEnumServiceStatus{$ENDIF};
   BytesNeeded, ServicesReturned: DWORD;
   i: Integer;
 begin
@@ -1034,7 +1039,7 @@ begin
     BytesNeeded := 0;
     ServicesReturned := 0;
     if EnumDependentServices(FHandle, SERVICE_ACTIVE + SERVICE_INACTIVE,
-      Services^, 0, BytesNeeded, ServicesReturned) then
+      {$IFDEF DELPHIRIOUP}Services{$ELSE}Services^{$ENDIF}, 0, BytesNeeded, ServicesReturned) then
       Exit;
     if GetLastError <> ERROR_MORE_DATA then
       RaiseLastOSError;
@@ -1042,7 +1047,7 @@ begin
     GetMem(Services, BytesNeeded);
     try
       if not EnumDependentServices(FHandle, SERVICE_ACTIVE + SERVICE_INACTIVE,
-        Services^, BytesNeeded, BytesNeeded, ServicesReturned) then
+        {$IFDEF DELPHIRIOUP}Services{$ELSE}Services^{$ENDIF}, BytesNeeded, BytesNeeded, ServicesReturned) then
         RaiseLastOSError;
       // Now process it...
       S := Services;

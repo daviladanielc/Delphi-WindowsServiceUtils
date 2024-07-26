@@ -20,7 +20,7 @@ type
     /// Requeries the states, names etc of all services on the given @link(MachineName).
     /// Works only while active.
     /// </summary>
-    function RebuildServicesList: ISvcUtils;
+    procedure RebuildServicesList;
 
     /// <summary>
     /// Install a service and return the instance to set config, start, stop etc...
